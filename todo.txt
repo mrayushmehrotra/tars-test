@@ -242,14 +242,14 @@
  G. DEPLOYMENT & SUBMISSION
 ================================================================================
 
-[ ] 1. Create public GitHub repository
-[ ] 2. Initialize git with proper .gitignore
-[ ] 3. Make initial commit with full codebase
-[ ] 4. Push to GitHub with frequent commits
-[ ] 5. Deploy to Vercel (free tier)
-    [ ] a. Set environment variables on Vercel
-    [ ] b. Set CONVEX_DEPLOY_KEY on Vercel
-    [ ] c. Verify deployed version works end-to-end
+[x] 1. Create public GitHub repository
+[x] 2. Initialize git with proper .gitignore
+[x] 3. Make initial commit with full codebase
+[x] 4. Push to GitHub with frequent commits
+[x] 5. Deploy to Vercel (free tier)
+    [x] a. Set environment variables on Vercel
+    [x] b. Set CONVEX_DEPLOY_KEY on Vercel
+    [x] c. Verify deployed version works end-to-end
 [ ] 6. Record Loom video (5 min max):
     [ ] a. 30-second self-introduction
     [ ] b. Camera on, face visible
