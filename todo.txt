@@ -1,0 +1,293 @@
+================================================================================
+ TARS FULL STACK ENGINEER INTERNSHIP CODING CHALLENGE 2026
+ Master Task Checklist
+================================================================================
+
+================================================================================
+ A. PROJECT SETUP & INFRASTRUCTURE
+================================================================================
+
+[x] 1. Initialize Next.js project with App Router
+[x] 2. Set up TypeScript
+[x] 3. Install and configure Tailwind CSS
+[x] 4. Install and configure shadcn/ui
+[x] 5. Install Convex (backend, database, realtime)
+[x] 6. Install Clerk (@clerk/nextjs)
+[x] 7. Install lucide-react for icons
+[x] 8. Create .env.example with all required env variables
+[x] 9. Create .env.local with actual Clerk + Convex keys
+[x] 10. Run `npx convex dev` to deploy backend & generate types
+[x] 11. Set up Clerk webhook in Clerk Dashboard → pointing to Convex /clerk-webhook
+[x] 12. Verify Convex _generated/ types are created
+[x] 13. Switch to Bun as the runtime (bun install, bun run dev)
+[x] 14. Create .gitignore (with node_modules, .env.local, .next, etc.)
+
+================================================================================
+ B. CONVEX BACKEND (schema-design.md)
+================================================================================
+
+[x] 1. Define schema.ts with all 6 tables:
+    [x] a. users (clerkId, name, email, avatarUrl, isOnline, lastSeen)
+    [x] b. conversations (isGroup, name, createdAt)
+    [x] c. conversationMembers (conversationId, userId, lastReadAt)
+    [x] d. messages (conversationId, senderId, body, createdAt, isDeleted)
+    [x] e. reactions (messageId, userId, emoji)
+    [x] f. typingIndicators (conversationId, userId, updatedAt)
+
+[x] 2. Create convex/users.ts
+    [x] a. upsertUser mutation (from Clerk webhook)
+    [x] b. getUserByClerkId query
+    [x] c. getAllUsers query (exclude self)
+    [x] d. searchUsers query (filter by name)
+    [x] e. updateOnlineStatus mutation
+    [x] f. getUserById query
+
+[x] 3. Create convex/conversations.ts
+    [x] a. getOrCreateDirectConversation mutation
+    [x] b. createGroupConversation mutation
+    [x] c. getUserConversations query (with unread count, latest message)
+    [x] d. markAsRead mutation
+    [x] e. getConversationById query
+
+[x] 4. Create convex/messages.ts
+    [x] a. sendMessage mutation (clears typing indicator)
+    [x] b. getMessages query (enriched with sender + reactions)
+    [x] c. deleteMessage mutation (soft delete, ownership check)
+
+[x] 5. Create convex/reactions.ts
+    [x] a. toggleReaction mutation (validate emoji set, toggle behavior)
+
+[x] 6. Create convex/typing.ts
+    [x] a. setTyping mutation (upsert)
+    [x] b. clearTyping mutation
+    [x] c. getTypingUsers query (filter expired, exclude self)
+
+[x] 7. Create convex/http.ts
+    [x] a. Clerk webhook handler (user.created, user.updated)
+
+================================================================================
+ C. ARCHITECTURE & CODE QUALITY (context.md)
+================================================================================
+
+[x] 1. Project Structure follows App Router structure
+    [x] a. app/ with layout.tsx, page.tsx, (auth)/, chat/
+    [x] b. components/ui/, chat/, sidebar/, messages/, indicators/
+    [x] c. hooks/ (useAuthUser, useConversations, useMessages, useTyping, useOnlineStatus)
+    [x] d. lib/ (utils.ts, dateFormatter.ts, constants.ts)
+    [x] e. convex/ (schema, users, conversations, messages, reactions, typing)
+    [x] f. services/ (conversationService, messageService, userService, reactionService)
+
+[x] 2. Service Layer (context.md Section 4 — OOP Principles)
+    [x] a. Create services/conversationService.ts
+    [x] b. Create services/messageService.ts
+    [x] c. Create services/userService.ts
+    [x] d. Create services/reactionService.ts
+
+[x] 3. Component Design Rules
+    [x] a. Container + Presentational pattern applied
+    [x] b. One responsibility per component
+    [x] c. No business logic inside presentation components
+    [x] d. Data passed via props (no direct fetching in presentational)
+
+[x] 4. Design Patterns Applied
+    [x] a. Factory Pattern — conversation creation (direct vs group)
+    [x] b. Observer Pattern — Convex subscriptions for real-time
+    [x] c. Strategy Pattern — timestamp formatting (today/thisYear/other)
+    [x] d. Controlled Component Pattern — message input
+    [x] e. State Lifting — selectedConversation at layout level
+
+[x] 5. State Management
+    [x] a. Server state via Convex (no Redux/Zustand)
+    [x] b. Unread count derived (not stored redundantly)
+    [x] c. No duplicate state
+
+[x] 6. Naming Conventions
+    [x] a. Components: PascalCase
+    [x] b. Hooks: useCamelCase
+    [x] c. Convex files: entityName.ts
+    [x] d. Functions: camelCase
+    [x] e. Constants: UPPER_SNAKE_CASE
+
+[x] 7. Comments & Documentation
+    [x] a. JSDoc comments on all functions with @param / @return
+    [x] b. File-level comments explaining purpose and data flow
+    [x] c. Architecture comments explaining design decisions
+
+[x] 8. Performance & Clean Code
+    [x] a. No "any" type usage
+    [x] b. No prop drilling beyond 2 levels
+    [x] c. Memoize heavy lists (React.memo on MessageItem, ConversationItem)
+    [x] d. Services used in components for business logic separation
+
+================================================================================
+ D. MANDATORY FEATURES (1–10)
+================================================================================
+
+[x] Feature 1: Authentication
+    [x] a. Clerk provider setup (ConvexClientProvider)
+    [x] b. Sign up page (/sign-up)
+    [x] c. Sign in page (/sign-in)
+    [x] d. Sign out button
+    [x] e. Display logged-in user name + avatar (SidebarHeader)
+    [x] f. Store user profiles in Convex (upsertUser via webhook + hook)
+    [x] g. Middleware protecting /chat route
+
+[x] Feature 2: User List & Search
+    [x] a. Show all registered users (excluding yourself)
+    [x] b. Search bar filtering by name in real time
+    [x] c. Clicking a user opens or creates a conversation
+
+[x] Feature 3: One-on-One Direct Messages
+    [x] a. Private conversations between two users
+    [x] b. Real-time message updates via Convex subscriptions
+    [x] c. Sidebar listing all conversations
+    [x] d. Preview of most recent message in sidebar
+
+[x] Feature 4: Message Timestamps
+    [x] a. Today: time only (e.g., 2:34 PM)
+    [x] b. Older this year: date + time (e.g., Feb 15, 2:34 PM)
+    [x] c. Different year: date + time + year
+
+[x] Feature 5: Empty States
+    [x] a. No conversations yet
+    [x] b. No messages in a conversation
+    [x] c. No search results
+    [x] d. No selected conversation (desktop default view)
+
+[x] Feature 6: Responsive Layout
+    [x] a. Desktop: sidebar + chat area side by side
+    [x] b. Mobile: conversation list as default view
+    [x] c. Mobile: tapping conversation opens full-screen chat
+    [x] d. Mobile: back button to return to conversation list
+    [x] e. Uses Tailwind responsive breakpoints (md:)
+
+[x] Feature 7: Online/Offline Status
+    [x] a. Green indicator for online users
+    [x] b. Real-time updates (visibility API + mount/unmount)
+    [x] c. OnlineIndicator component with pulse animation
+
+[x] Feature 8: Typing Indicator
+    [x] a. "Alex is typing..." text display
+    [x] b. Pulsing dots animation
+    [x] c. Disappear after ~2 seconds of inactivity
+    [x] d. Disappear when message is sent
+
+[x] Feature 9: Unread Message Count
+    [x] a. Badge on each conversation in sidebar
+    [x] b. Shows number of unread messages
+    [x] c. Clears when conversation is opened (markAsRead)
+    [x] d. Real-time updates via Convex subscription
+
+[x] Feature 10: Smart Auto-Scroll
+    [x] a. Auto-scroll to latest message when at bottom
+    [x] b. Do not force-scroll if user scrolled up
+    [x] c. "↓ New messages" floating button
+
+================================================================================
+ E. OPTIONAL FEATURES (11–14)
+================================================================================
+
+[x] Feature 11: Delete Own Messages
+    [x] a. Delete button on own messages (visible on hover)
+    [x] b. Show "This message was deleted" (italics)
+    [x] c. Soft delete (isDeleted flag, record remains in Convex)
+    [x] d. Ownership check (only sender can delete)
+
+[x] Feature 12: Message Reactions
+    [x] a. Fixed emoji set: 👍 ❤️ 😂 😮 😢
+    [x] b. Reaction picker popover on messages
+    [x] c. Clicking same reaction removes it (toggle)
+    [x] d. Show reaction counts below message
+    [x] e. Visual indicator for user's own reactions
+
+[x] Feature 13: Loading & Error States
+    [x] a. Skeleton loaders for sidebar conversations
+    [x] b. Skeleton loaders for chat messages
+    [x] c. Skeleton loader for chat area header
+    [x] d. Loading screen on initial auth load
+    [x] e. Error display when message fails to send
+    [x] f. Retry button for failed messages
+
+[x] Feature 14: Group Chat
+    [x] a. Create group conversation dialog
+    [x] b. Pick multiple members with toggle selection
+    [x] c. Give group a name (required input)
+    [x] d. Real-time messages for all members
+    [x] e. Group name + member count in sidebar
+
+================================================================================
+ F. UI/UX POLISH (frontend-design.md + evaluation criteria)
+================================================================================
+
+[x] 1. Dark theme with custom color palette (emerald/charcoal)
+[x] 2. Custom fonts (Outfit for display, DM Sans for body)
+[x] 3. Glassmorphism effects (glass, glass-strong classes)
+[x] 4. Custom animations:
+    [x] a. Message slide-in animation
+    [x] b. Typing dots pulsing animation
+    [x] c. Online indicator pulse glow
+    [x] d. Fade-in + slide-up animations
+    [x] e. "New messages" button bounce
+    [x] f. Skeleton shimmer effect
+[x] 5. Custom scrollbar styling
+[x] 6. Clerk dark theme matching app palette
+[ ] 7. Overall UI/UX polish & testing
+    [ ] a. Test all responsive breakpoints
+    [ ] b. Test all empty states render properly
+    [ ] c. Test all animations trigger correctly
+    [ ] d. Verify color consistency across all components
+    [ ] e. Check font rendering (Outfit + DM Sans loading)
+
+================================================================================
+ G. DEPLOYMENT & SUBMISSION
+================================================================================
+
+[ ] 1. Create public GitHub repository
+[ ] 2. Initialize git with proper .gitignore
+[ ] 3. Make initial commit with full codebase
+[ ] 4. Push to GitHub with frequent commits
+[ ] 5. Deploy to Vercel (free tier)
+    [ ] a. Set environment variables on Vercel
+    [ ] b. Set CONVEX_DEPLOY_KEY on Vercel
+    [ ] c. Verify deployed version works end-to-end
+[ ] 6. Record Loom video (5 min max):
+    [ ] a. 30-second self-introduction
+    [ ] b. Camera on, face visible
+    [ ] c. Open code editor
+    [ ] d. Walk through one feature
+    [ ] e. Demo it working live
+    [ ] f. Make a small live code change & show it reflected
+[ ] 7. Send submission email:
+    [ ] To: vaibhav@hellotars.com
+    [ ] CC: vinit@hellotars.com
+    [ ] Subject: Fullstack Intern Code Challenge Submission
+    [ ] Body includes:
+        [ ] Full Name
+        [ ] Email
+        [ ] Link to GitHub Repo
+        [ ] Link to Vercel App
+        [ ] Link to Loom Video
+        [ ] Link to LinkedIn Profile
+        [ ] AI-Assisted Coding Tool used
+
+================================================================================
+ PROGRESS SUMMARY
+================================================================================
+
+ Setup & Infra:       13/14 done  (remaining: Clerk webhook setup)
+ Convex Backend:       7/7  done  ✅ COMPLETE
+ Architecture:         8/8  done  ✅ COMPLETE
+ Mandatory (1–10):    10/10 done  ✅ COMPLETE
+ Optional (11–14):     4/4  done  ✅ COMPLETE
+ UI/UX Polish:         6/7  done  (missing: manual testing pass)
+ Deployment:           0/7  done
+
+ REMAINING TASKS (requires your manual action):
+ → Set up Clerk webhook in dashboard → /clerk-webhook
+ → Manual UI/UX testing pass (responsive, empty states, animations)
+ → Git init, push to GitHub
+ → Deploy to Vercel
+ → Record Loom video
+ → Send submission email
+
+================================================================================

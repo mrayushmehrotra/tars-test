@@ -2,26 +2,217 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Design System — Tars Chat
+ *
+ * Aesthetic: Dark luxury — deep charcoal backgrounds,
+ * emerald green accents, soft glassmorphism, refined typography.
+ *
+ * Color Palette:
+ *   Background:  hsl(240 20% 4%)  → Deep midnight
+ *   Card:        hsl(240 15% 8%)  → Dark surface
+ *   Muted:       hsl(240 10% 15%) → Subtle surfaces
+ *   Primary:     hsl(160 84% 39%) → Emerald accent
+ *   Foreground:  hsl(210 40% 90%) → Soft white text
+ */
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 240 20% 4%;
+    --foreground: 210 40% 90%;
+    --card: 240 15% 8%;
+    --card-foreground: 210 40% 90%;
+    --popover: 240 15% 8%;
+    --popover-foreground: 210 40% 90%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 15%;
+    --secondary-foreground: 210 20% 80%;
+    --muted: 240 10% 15%;
+    --muted-foreground: 215 15% 55%;
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 10% 18%;
+    --input: 240 10% 18%;
+    --ring: 160 84% 39%;
+    --radius: 0.75rem;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-outfit), system-ui, sans-serif;
+  }
 }
 
+/* ─── Scrollbar Styling ─── */
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
   }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}
+
+/* ─── Glassmorphism Utility ─── */
+@layer utilities {
+  .glass {
+    background: hsla(var(--card), 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsla(var(--border), 0.5);
+  }
+
+  .glass-strong {
+    background: hsla(var(--card), 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsla(var(--border), 0.6);
+  }
+}
+
+/* ─── Typing Indicator Animation ─── */
+@keyframes typing-dot {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+.typing-dot {
+  animation: typing-dot 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ─── Message Slide-in Animation ─── */
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-message-in {
+  animation: message-in 0.25s ease-out;
+}
+
+/* ─── Pulse Glow for Online Indicator ─── */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsla(160, 84%, 39%, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 4px hsla(160, 84%, 39%, 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ─── Fade In Animation ─── */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* ─── Slide Up Animation ─── */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+/* ─── New Message Button Bounce ─── */
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 1.5s ease-in-out infinite;
+}
+
+/* ─── Skeleton Shimmer ─── */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--secondary)) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }
