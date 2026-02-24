@@ -38,14 +38,15 @@ export function UserSearch({
     const [searchTerm, setSearchTerm] = useState("");
 
     // Fetch users based on search term — real-time filtering
-    const users = useQuery(
-        searchTerm.trim()
-            ? api.users.searchUsers
-            : api.users.getAllUsers,
-        searchTerm.trim()
-            ? { searchTerm: searchTerm.trim(), currentUserId: currentUser._id }
-            : { currentUserId: currentUser._id }
+    const usersWithSearch = useQuery(
+        api.users.searchUsers,
+        searchTerm.trim() ? { searchTerm: searchTerm.trim(), currentUserId: currentUser._id } : "skip"
     );
+    const usersWithoutSearch = useQuery(
+        api.users.getAllUsers,
+        { currentUserId: currentUser._id }
+    );
+    const users = searchTerm.trim() ? usersWithSearch : usersWithoutSearch;
 
     return (
         <div className="border-b border-border/50 animate-slide-up">
